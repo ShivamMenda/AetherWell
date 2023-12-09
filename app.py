@@ -1,6 +1,7 @@
 import findspark
 findspark.init()
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import lower,trim
 from pyspark.ml.recommendation import ALSModel
 from flask import Flask, request, jsonify,Response
 import json
@@ -29,8 +30,15 @@ def predict():
         print("Data loaded")
         rec_saved_model=ALSModel.load("./models/als_model")
         print("Starting Prediction")
+        print("Getting ID")
         def get_id(symptom):
-            return int(df.filter(df["symptom"]==symptom).select("syd").collect()[0][0])
+            symptom = symptom.lower().strip()  # convert input symptom to lowercase and remove leading/trailing whitespace
+            rows = df.filter(lower(trim(df["symptom"])) == symptom).select("syd").collect()
+            if rows:
+                return int(rows[0][0])
+            else:
+                return None
+        print("ID fetched")
         # Get user input for symptoms
         symptoms=request.json["symptoms"]
         final_symptoms = []

@@ -24,7 +24,7 @@ dia=spark.read.csv("./datasets/diagnosis.csv",header=True,inferSchema=True)
 # dia.show(4)
 # print("diff")
 # diff.show(4)
-print("feature engineering")
+print("feature engineering started")
 string_indexer=StringIndexer(inputCol="symptom",outputCol="symptom_index")
 model=string_indexer.setHandleInvalid("skip").fit(df)
 indexed=model.transform(df)
@@ -41,7 +41,8 @@ encoder=OneHotEncoder(dropLast=False,inputCols=["diagnose_index"],outputCols=["d
 encoded=encoder.fit(indexed).transform(indexed)
 df=encoded
 # df.show(4)
-
+print("feature engineering completed")
+print("feature scaling")
 cols=["symptom","diagnose"]
 for col in cols:
     scaler=MinMaxScaler(inputCol=col+"_vec",outputCol=col+"_vec_scaled")
@@ -52,7 +53,9 @@ for col in cols:
 vec_assembler=VectorAssembler(inputCols=["symptom_vec_scaled","diagnose_vec_scaled"],outputCol="features")
 df=vec_assembler.transform(df)
 # df.show(4)
+print("feature scaling completed")
 
+print("PCA and Kmeans started")
 
 kmeans=KMeans(k=2,seed=1)
 model=kmeans.fit(df.select("features"))
@@ -70,6 +73,7 @@ dataY=[]
 for vec in pandasDf.values:
     dataX.append(vec[0][0])
     dataY.append(vec[0][1])
+print("PCA and Kmeans completed")
 
 
 # plt.scatter(dataX,dataY)
@@ -104,9 +108,9 @@ for vec in pandasDf.values:
 # wei_max_value=df.agg({'wei':'max'}).collect()[0][0]
 # wei_min_value=df.agg({'wei':'min'}).collect()[0][0]
 
-
-
+print("Loading model")
 rec_saved_model=ALSModel.load("./models/als_model")
+print("Model loaded")
 
 def get_id(symptom):
     return int(df.filter(df["symptom"]==symptom).select("syd").collect()[0][0])
