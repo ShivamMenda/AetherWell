@@ -68,4 +68,4 @@ def predict():
         return Response(json.dumps(response,ensure_ascii=True), mimetype='application/json')
 
 if __name__=="__main__":
-    app.run(debug=True,port=8080)
+    app.run(debug=True,port=4000)

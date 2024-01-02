@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  healthrec-flask-api:
+    build: 
+      context: ./flask_api
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    
+
+  healthrec-node-api:
+    build: 
+      context: ./node_api
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"

@@ -1,0 +1,6 @@
+# pip install -r requirements.txt
+pyspark===3.5.0
+flask===2.0.2
+findspark===2.0.1
+numpy===1.21.2
+Werkzeug==2.2.2
