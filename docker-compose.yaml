@@ -1,17 +1,22 @@
 version: '3.8'
 
 services:
-  healthrec-flask-api:
+  flask-api:
     build: 
       context: ./flask_api
       dockerfile: Dockerfile
     ports:
       - "4000:4000"
-    
+    volumes:
+      - ./flask_api:/app
+    # Other configurations for Flask API (e.g., environment variables)
 
-  healthrec-node-api:
+  nodejs-api:
     build: 
       context: ./node_api
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    volumes:
+      - ./node_api:/app
+    # Other configurations for Node.js API (e.g., environment variables, MongoDB configuration)
