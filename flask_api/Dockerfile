@@ -17,9 +17,9 @@ COPY app.py /app/
 RUN pip3 install -r requirements.txt
 
 # Download and install Spark
-RUN curl -O https://archive.apache.org/dist/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz
-RUN tar xvf spark-3.1.2-bin-hadoop3.2.tgz
-RUN mv spark-3.1.2-bin-hadoop3.2 /spark
+# RUN curl -O https://archive.apache.org/dist/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz
+# RUN tar xvf spark-3.1.2-bin-hadoop3.2.tgz
+COPY spark/spark-3.1.2-bin-hadoop3.2 /spark
 
 # Set environment variables for Spark and PySpark
 ENV SPARK_HOME=/spark

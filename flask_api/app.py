@@ -59,13 +59,13 @@ def predict():
 
         return Response(json.dumps(response,ensure_ascii=True), mimetype='application/json')
     except Exception as e:
-        print(e)
         response = {
         "result": [],
         "value_input": symptoms,
-        "message": "Error"
+        "message": "Error",
+        "error": str(e)
         }
         return Response(json.dumps(response,ensure_ascii=True), mimetype='application/json')
 
 if __name__=="__main__":
-    app.run(debug=True,port=4000)
+    app.run(host="0.0.0.0",debug=True,port=4000)
