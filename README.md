@@ -4,10 +4,10 @@ Final year project that involves building a Health Recommendation System using P
 # Phase 1
 - [X] Building and setting up a Machine Learning model.
 
-- [ ] Testing the model
+- [X] Testing the model
 
 # Phase 2
-- [ ] Building Rest API using Flask
+- [X] Building Rest API using Flask
 
 - [ ] Planning Website and Database Structure
 
