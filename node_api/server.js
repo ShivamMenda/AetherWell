@@ -6,16 +6,14 @@ const app=express();
 
 config({path:'./config.env'});
 
-let db= async()=>{
-    await mongoose.connect(process.env.DATABASE).then(()=>{
+
+mongoose.connect(process.env.DATABASE).then(()=>{
         console.log('Database connected');
     }).catch((err)=>{
         console.log(err);
     });
-}
-db();
 
-if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 

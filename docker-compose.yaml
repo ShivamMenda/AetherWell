@@ -9,7 +9,6 @@ services:
       - "4000:4000"
     volumes:
       - ./flask_api:/app
-    # Other configurations for Flask API (e.g., environment variables)
 
   nodejs-api:
     build: 
@@ -19,4 +18,19 @@ services:
       - "3000:3000"
     volumes:
       - ./node_api:/app
-    # Other configurations for Node.js API (e.g., environment variables, MongoDB configuration)
+    env_file:
+      - ./node_api/config.env
+    depends_on:
+      - flask-api
+      - mongodb
+  
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+
+volumes:
+  mongodb_data:
+
