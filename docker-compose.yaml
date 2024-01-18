@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
   flask-api:
-    build: 
+    build:
       context: ./flask_api
       dockerfile: Dockerfile
     ports:
@@ -11,19 +11,20 @@ services:
       - ./flask_api:/app
 
   nodejs-api:
-    build: 
+    build:
       context: ./node_api
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
       - ./node_api:/app
+      - /app/node_modules
     env_file:
       - ./node_api/config.env
     depends_on:
       - flask-api
       - mongodb
-  
+
   mongodb:
     image: mongo:latest
     volumes:
@@ -33,4 +34,3 @@ services:
 
 volumes:
   mongodb_data:
-
