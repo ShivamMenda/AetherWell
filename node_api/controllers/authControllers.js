@@ -78,12 +78,12 @@ export async function userSignup(req, role, res) {
 
 export async function userLogin(req,role,res) {
 
-  let { name, password } = req;
+  let { email, password } = req;
     if (role=="doctor") {
-        const doctor=await Doctor.findOne({name});
+        const doctor=await Doctor.findOne({email});
         if (!doctor) {
             return res.status(404).json({
-                message:'Doctor name is not found. Invalid login credentials.',
+                message:'Doctor email is not found. Invalid login credentials.',
                 success:false
             });
         }
@@ -113,7 +113,7 @@ export async function userLogin(req,role,res) {
         }
     }
     else {
-  const user = await User.findOne({ name });
+  const user = await User.findOne({ email });
   if (!user) {
     return res.status(404).json({
       message: "User name is not found. Invalid login credentials.",
