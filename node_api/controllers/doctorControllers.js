@@ -1,6 +1,7 @@
 import Doctor from "../models/doctors.js";
 import DoctorAppointment from "../models/doctorAppointments.js";
 import Appointment from "../models/appointments.js";
+import UserAppointment from "../models/userAppointments.js";
 
 export async function getDoctorprofile(req,res){
     try{
@@ -115,6 +116,54 @@ export async function updateAppointmentStatus(req,res){
             return res.status(200).json({
                 status:'success',
                 doctorAppointment:doctorAppointment,
+            });
+        }).catch((err)=>{
+            return res.status(500).json({
+                status:'fail',
+                message:err.message
+            });
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status:'fail',
+            message:error.message
+        });
+    }
+}
+
+export async function cancelDoctorAppointment(req,res){
+    try {
+        let doctorId=req.user.id;
+        let appointmentId=req.params.aid;
+        let isDeleted= await DoctorAppointment.findOneAndDelete({doctorId:doctorId,appointmentId:appointmentId}) && Appointment.findOneAndDelete({_id:appointmentId}) && UserAppointment.findOneAndDelete({appointmentId:appointmentId});
+        let isCancelled= await DoctorAppointment.findOneAndUpdate({doctorId:doctorId,appointmentId:appointmentId},{status:"cancelled"});
+        if(!isDeleted || !isCancelled){
+            return res.status(400).json({
+                status:'fail',
+                message:'Appointment not cancelled'
+            });
+        }
+        return res.status(200).json({
+            status:'success',
+            message:'Appointment cancelled successfully',
+        });
+    
+    } catch (error) {
+        return res.status(500).json({
+            status:'fail',
+            message:error.message
+        });
+    }
+}
+
+export async function updateDoctorAvailabilityById(req,res){
+    try {
+        let doctorId=req.params.did;
+        let availability=req.body.availability;
+        await Doctor.findByIdAndUpdate(doctorId,{availability:availability}).then((doctor)=>{
+            return res.status(200).json({
+                status:'success',
+                doctor:doctor,
             });
         }).catch((err)=>{
             return res.status(500).json({

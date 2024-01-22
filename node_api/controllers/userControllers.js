@@ -173,7 +173,7 @@ export async function bookAppointment(req,res){
 
 export async function getUserAppointments(req,res){
     try {
-    let uid=req.params.uid;
+    let uid=req.user.id;
     let userAppointments= await UserAppointment.find({uid});
     if (!userAppointments) {
         return res.status(400).json({
@@ -198,4 +198,47 @@ export async function getUserAppointments(req,res){
         });
     }
     
+}
+
+export async function getUserNamebyId(req,res) {
+    try {
+        let user= await User.findById(req.params.uid);
+        if (!user) {
+            return res.status(400).json({
+                status:'fail',
+                message:'User not found'
+            });
+        };
+        return res.status(200).json({
+            status:'success',
+            name:user.name,
+        });
+    } catch (error) {
+        
+    }
+};
+
+export async function cancelAppointment(req,res) {
+    let uid=req.user.id;
+    let appointmentId=req.params.aid;
+    let userAppointment= await UserAppointment.findOne({uid,appointmentId});
+    if (!userAppointment) {
+        return res.status(400).json({
+            status:'fail',
+            message:'Appointment not found'
+        });
+    };
+    let isUserCancelled= await UserAppointment.deleteOne({uid,appointmentId});
+    let isDoctorCancelled= await DoctorAppointment.deleteOne({appointmentId});
+    let isAppCancelled= await Appointment.findByIdAndDelete(appointmentId);
+    if (!isUserCancelled || !isDoctorCancelled || !isAppCancelled) {
+        return res.status(400).json({
+            status:'fail',
+            message:'Appointment not cancelled'
+        });
+    };
+    return res.status(200).json({
+        status:'success',
+        message:'Appointment cancelled successfully'
+    });
 }
