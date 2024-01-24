@@ -158,23 +158,35 @@ export async function cancelDoctorAppointment(req,res){
 
 export async function updateDoctorAvailabilityById(req,res){
     try {
-        let doctorId=req.params.did;
-        let availability=req.body.availability;
-        await Doctor.findByIdAndUpdate(doctorId,{availability:availability}).then((doctor)=>{
-            return res.status(200).json({
-                status:'success',
-                doctor:doctor,
+        const { day, slot } = req.body;
+        const doctor = await Doctor.findById(req.params.did);
+        if (!doctor) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Doctor not found'
             });
-        }).catch((err)=>{
-            return res.status(500).json({
-                status:'fail',
-                message:err.message
+        }
+
+        const dayAvailability = doctor.availability.find(d => d.day === day);
+        if (!dayAvailability) {
+            return res.status(400).json({
+                status: 'fail',
+                message: `No availability set for ${day}`
             });
+        }
+
+        dayAvailability.slots.push(slot);
+
+        await doctor.save();
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Availability updated successfully'
         });
-    } catch (error) {
+    } catch (err) {
         return res.status(500).json({
-            status:'fail',
-            message:error.message
+            status: 'fail',
+            message: err.message
         });
     }
 }
