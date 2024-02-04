@@ -1,6 +1,6 @@
 import express from 'express';
 const userRouter= express.Router();
-import { getUserprofile,updateUserprofile,bookAppointment,getUserAppointments,getUserNamebyId,cancelAppointment } from '../controllers/userControllers.js';
+import { getUserprofile,updateUserprofile,bookAppointment,getUserAppointments,getUserNamebyId,cancelAppointment,getAllDoctors } from '../controllers/userControllers.js';
 
 userRouter.get("/meUser",(req,res)=> {
         /*
@@ -24,8 +24,9 @@ userRouter.get("/meUser",(req,res)=> {
     });
     
 });
-userRouter.get("/profile/:uid",getUserprofile);
-userRouter.patch("/updateProfile/:uid",updateUserprofile);
+userRouter.get("/profile/",getUserprofile);
+userRouter.patch("/updateProfile/",updateUserprofile);
+userRouter.get("/getAllDoctors",getAllDoctors);
 userRouter.post("/bookAppointment",bookAppointment);
 userRouter.get("/appointments",getUserAppointments);
 userRouter.get("/getName/:uid",getUserNamebyId);

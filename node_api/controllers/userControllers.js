@@ -9,7 +9,7 @@ export async function getUserprofile(req,res){
 #swagger.tags = ['User']
 */
     try{
-        let user= await User.findById(req.params.uid);
+        let user= await User.findById(req.user.id);
         if(!user){
             return res.status(400).json({
                 status:'fail',
@@ -41,7 +41,7 @@ export async function updateUserprofile(req,res){
 #swagger.tags = ['User']
 */
     try{
-        let user= await User.findById(req.params.uid);
+        let user= await User.findById(req.user.id);
         if(!user){
             return res.status(400).json({
                 status:'fail',
@@ -87,51 +87,41 @@ export async function bookAppointment(req,res){
             message:'Doctor not found'
         });
     };
-    const dayAvailability= doctor.availability.find((availability)=>availability.day===date.getDay());
-    if (!dayAvailability) {
+    let temp_day= new Date(date.split('-').reverse().join('-')).toLocaleDateString('en-US', { weekday: 'long' });
+
+    let dayAvailability= doctor.availability.find((day)=>{
+        day.day==temp_day? true:false;
+    })
+    for (let day of doctor.availability) {
+        for (let slot of day.slots) {
+            slot.status='available'? dayAvailability=true:dayAvailability=false;
+        }
+    }
+    if (dayAvailability===false ) {
         return res.status(400).json({
             status:'fail',
-            message:'Doctor not available on this day'
-        });
-        
-    };
-    const requestedSlot = { start: startTime, end: endTime };
-    const isSlotAvailable = dayAvailability.slots.some((slot) => {
-        return slot.start <= requestedSlot.end && slot.end >= requestedSlot.start;
-      });
-    if (!isSlotAvailable) {
-        return res.status(400).json({
-            status:'fail',
-            message:'Slot not available'
+            message:'Doctor not available',
         });
     };
-    // const bookedSlot = dayAvailability.slots.find((slot) => {
-    //     return slot.start === requestedSlot.start && slot.end === requestedSlot.end;
-    //   });
-    const finalDate= new Date(date);
+    let finalDate= new Date(date);
     let uid=req.user.id;
     let newAppointment={
-        doctorId,
-        uid,
-        finalDate,
+        doctorId:doctorId,
+        userId:uid,
+        date:finalDate,
+        status:'confirmed'
     };
 
 
-    await Appointment.create(newAppointment).then((appointment)=>{
-        return res.status(200).json({
-            status:'success',
-            appointment: appointment,
-
-        });
-    }).catch((err)=>{
-        return res.status(500).json({
+    let app = await Appointment.create(newAppointment);
+    if (!app) {
+        return res.status(400).json({
             status:'fail',
-            message:err.message
+            message:'Appointment not booked'
         });
-    });
+    };
 
-    let newAppointmentBooked=Appointment.findOne(newAppointment);
-    let newAppointmentId=newAppointmentBooked._id;
+    let newAppointmentBooked= await Appointment.findById(app._id);
     if (!newAppointmentBooked) {
         return res.status(400).json({
             status:'fail',
@@ -139,36 +129,34 @@ export async function bookAppointment(req,res){
         });
         
     }
-    await UserAppointment.create({
-        uid,
-        newAppointmentId, 
-    }).then((userAppointment)=>{
-        return res.status(200).json({
-            status:'success',
-            userAppointment:userAppointment,
-        });
-    }).catch((err)=>{
-        return res.status(500).json({
-            status:'fail',
-            message:err.message
-        });
+    let userApp= await UserAppointment.create({
+        userId:uid,
+        appointmentId:newAppointmentBooked._id, 
     });
 
-    await DoctorAppointment.create({
-        doctorId,
-        newAppointmentId,
-    }).then((doctorAppointment)=>{
-        return res.status(200).json({
-            status:'success',
-            doctorAppointment:doctorAppointment,
-        });
-    }).catch((err)=>{
-        return res.status(500).json({
-            status:'fail',
-            message:err.message
-        });
+    let doctorApp= await DoctorAppointment.create({
+        doctorId:doctorId,
+        appointmentId:newAppointmentBooked._id,
     });
-
+    if (!userApp || !doctorApp) {
+        return res.status(400).json({
+            status:'fail',
+            message:'Appointment not booked'
+        });
+    };
+    for (let day of doctor.availability) {
+        if (day.day==temp_day) {
+            for (let slot of day.slots) {
+                if (slot.start==startTime && slot.end==endTime) {
+                    slot.status='booked';
+                }
+            }
+        }
+    }
+    return res.status(200).json({
+        status:'success',
+        appointment: newAppointment,
+    });
     
         
     } catch (error) {
@@ -259,4 +247,30 @@ export async function cancelAppointment(req,res) {
         status:'success',
         message:'Appointment cancelled successfully'
     });
+}
+
+export async function getAllDoctors(req,res){
+            /*  #swagger.tags = ['User']
+                #swagger.description = 'Get all doctors'
+            */
+    try {
+        let doctors= await Doctor.find();
+        if (!doctors) {
+            return res.status(400).json({
+                status:'fail',
+                message:'No doctors found'
+            });
+        }
+        else{
+            return res.status(200).json({
+                status:'success',
+                doctors:doctors,
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status:'fail',
+            message:error.message
+        });
+    }
 }

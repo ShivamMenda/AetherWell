@@ -22,6 +22,7 @@ export async function getDoctorprofile(req,res){
             age:doctor.age,
             address:doctor.address,
             phone:doctor.phone,
+            specialization:doctor.specialization,
             createdAt:doctor.createdAt,
         };
         return res.status(200).json({
@@ -35,6 +36,45 @@ export async function getDoctorprofile(req,res){
         });
     }
 }
+
+export async function updateDoctorProfile(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
+    try{
+        let doctor= await Doctor.findById(req.user.id);
+        if(!doctor){
+            return res.status(400).json({
+                status:'fail',
+                message:'Doctor not found'
+            });
+        }
+        doctor.name=req.body.name;
+        doctor.email=req.body.email;
+        doctor.age=req.body.age;
+        doctor.address=req.body.address;
+        doctor.phone=req.body.phone;
+        await doctor.save();
+        return res.status(200).json({
+            status:'success',
+            profile:{
+                name:doctor.name,
+                email:doctor.email,
+                role:doctor.role,
+                age:doctor.age,
+                address:doctor.address,
+                phone:doctor.phone,
+                createdAt:doctor.createdAt,
+            }
+        });
+    }catch(err){
+        return res.status(500).json({
+            status:'fail',
+            message:err.message
+        });
+    
+};
+};
 
 export async function getDoctorNamebyId(req,res){
         /*
@@ -180,7 +220,7 @@ export async function updateDoctorAvailabilityById(req,res){
 */
     try {
         const { day, slot } = req.body;
-        const doctor = await Doctor.findById(req.params.did);
+        const doctor = await Doctor.findById(req.user.id);
         if (!doctor) {
             return res.status(404).json({
                 status: 'fail',
@@ -195,9 +235,16 @@ export async function updateDoctorAvailabilityById(req,res){
                 message: `No availability set for ${day}`
             });
         }
-
+        let s = dayAvailability.slots.find(s => s.start === slot.start && s.end === slot.end);
+        if(s.status === 'available') {
         dayAvailability.slots.push(slot);
-
+        }
+        else{
+            return res.status(400).json({
+                status: 'fail',
+                message: `Slot not available`
+            });
+        }
         await doctor.save();
 
         return res.status(200).json({
@@ -211,3 +258,48 @@ export async function updateDoctorAvailabilityById(req,res){
         });
     }
 }
+
+export async function updateAvailabilityStatus(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
+    try {
+        const { day, slot } = req.body;
+        const doctor = await Doctor.findById(req.user.id);
+        if (!doctor) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Doctor not found'
+            });
+        }
+
+        const dayAvailability = doctor.availability.find(d => d.day === day);
+        if (!dayAvailability) {
+            return res.status(400).json({
+                status: 'fail',
+                message: `No availability set for ${day}`
+            });
+        }
+        let s = dayAvailability.slots.find(s => s.start === slot.start && s.end === slot.end);
+        if(s.status === 'available') {
+        s.status = 'booked';
+        }
+        else{
+            return res.status(400).json({
+                status: 'fail',
+                message: `Slot not available`
+            });
+        }
+        await doctor.save();
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Availability updated successfully'
+        });
+    } catch (err) {
+        return res.status(500).json({
+            status: 'fail',
+            message: err.message
+        });
+    }
+};

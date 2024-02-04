@@ -1,6 +1,6 @@
 import express from 'express';
 const doctorRouter= express.Router();
-import { getDoctorprofile,getDoctorNamebyId,getDoctorAppointments,createDoctorAppointment,updateAppointmentStatus,cancelDoctorAppointment,updateDoctorAvailabilityById } from '../controllers/doctorControllers.js';
+import { getDoctorprofile,getDoctorNamebyId,getDoctorAppointments,createDoctorAppointment,updateAppointmentStatus,cancelDoctorAppointment,updateDoctorAvailabilityById,updateDoctorProfile,updateAvailabilityStatus } from '../controllers/doctorControllers.js';
 
 doctorRouter.get("/me",(req,res)=> {
     /*
@@ -25,9 +25,11 @@ doctorRouter.get("/me",(req,res)=> {
 });
 doctorRouter.get("/profile/:did",getDoctorprofile);
 doctorRouter.get("/name/:did",getDoctorNamebyId);
+doctorRouter.patch("/updateProfile/",updateDoctorProfile);
 doctorRouter.get("/appointments/",getDoctorAppointments);
 doctorRouter.post("/createAppointment/:aid",createDoctorAppointment);
 doctorRouter.put("/updateAppointmentStatus/:aid",updateAppointmentStatus);
 doctorRouter.delete("/deleteAppointment/:aid",cancelDoctorAppointment);
 doctorRouter.patch("/updateAvailability/:did",updateDoctorAvailabilityById);
+doctorRouter.patch("/updateAvailabilityStatus/:did",updateAvailabilityStatus);
 export default doctorRouter;
