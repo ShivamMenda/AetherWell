@@ -5,6 +5,9 @@ import UserAppointment from "../models/userAppointments.js";
 import DoctorAppointment from "../models/doctorAppointments.js";
 
 export async function getUserprofile(req,res){
+        /*
+#swagger.tags = ['User']
+*/
     try{
         let user= await User.findById(req.params.uid);
         if(!user){
@@ -34,6 +37,9 @@ export async function getUserprofile(req,res){
 }
 
 export async function updateUserprofile(req,res){
+            /*
+#swagger.tags = ['User']
+*/
     try{
         let user= await User.findById(req.params.uid);
         if(!user){
@@ -69,6 +75,9 @@ export async function updateUserprofile(req,res){
 }
 
 export async function bookAppointment(req,res){
+            /*
+#swagger.tags = ['User']
+*/
     try {
         let {doctorId,date,startTime,endTime}= req.body;
     let doctor= await Doctor.findById(doctorId);
@@ -172,6 +181,9 @@ export async function bookAppointment(req,res){
 }
 
 export async function getUserAppointments(req,res){
+            /*
+#swagger.tags = ['User']
+*/
     try {
     let uid=req.user.id;
     let userAppointments= await UserAppointment.find({uid});
@@ -201,6 +213,9 @@ export async function getUserAppointments(req,res){
 }
 
 export async function getUserNamebyId(req,res) {
+            /*
+#swagger.tags = ['User']
+*/
     try {
         let user= await User.findById(req.params.uid);
         if (!user) {
@@ -219,6 +234,9 @@ export async function getUserNamebyId(req,res) {
 };
 
 export async function cancelAppointment(req,res) {
+            /*
+#swagger.tags = ['User']
+*/
     let uid=req.user.id;
     let appointmentId=req.params.aid;
     let userAppointment= await UserAppointment.findOne({uid,appointmentId});

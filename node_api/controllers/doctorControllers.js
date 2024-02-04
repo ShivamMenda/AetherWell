@@ -4,6 +4,9 @@ import Appointment from "../models/appointments.js";
 import UserAppointment from "../models/userAppointments.js";
 
 export async function getDoctorprofile(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
     try{
         let doctor= await Doctor.findById(req.params.did);
         if(!doctor){
@@ -34,6 +37,9 @@ export async function getDoctorprofile(req,res){
 }
 
 export async function getDoctorNamebyId(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
     let doctor= Doctor.findById(req.params.did);
     if (!doctor) {
         return res.status(404).json({
@@ -48,6 +54,9 @@ export async function getDoctorNamebyId(req,res){
 }
 
 export async function getDoctorAppointments(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
     try{
         let doctor= await Doctor.findById(req.user.id);
         if(!doctor){
@@ -82,6 +91,9 @@ export async function getDoctorAppointments(req,res){
 }
 
 export async function createDoctorAppointment(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
     try {
         let doctorId=req.user.id;
         let newAppointmentId=req.params.aid;
@@ -108,6 +120,9 @@ export async function createDoctorAppointment(req,res){
 }
 
 export async function updateAppointmentStatus(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
     try {
         let doctorId=req.user.id;
         let appointmentId=req.params.aid;
@@ -132,6 +147,9 @@ export async function updateAppointmentStatus(req,res){
 }
 
 export async function cancelDoctorAppointment(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
     try {
         let doctorId=req.user.id;
         let appointmentId=req.params.aid;
@@ -157,6 +175,9 @@ export async function cancelDoctorAppointment(req,res){
 }
 
 export async function updateDoctorAvailabilityById(req,res){
+        /*
+#swagger.tags = ['Doctor']
+*/
     try {
         const { day, slot } = req.body;
         const doctor = await Doctor.findById(req.params.did);

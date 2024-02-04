@@ -2,7 +2,10 @@ import express from 'express';
 const userRouter= express.Router();
 import { getUserprofile,updateUserprofile,bookAppointment,getUserAppointments,getUserNamebyId,cancelAppointment } from '../controllers/userControllers.js';
 
-userRouter.get("/me",(req,res)=> {
+userRouter.get("/meUser",(req,res)=> {
+        /*
+#swagger.tags = ['User']
+*/
     let user=req.user;
     if(!user || user.role!='user'){
         return res.status(400).json({

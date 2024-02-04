@@ -3,6 +3,9 @@ const doctorRouter= express.Router();
 import { getDoctorprofile,getDoctorNamebyId,getDoctorAppointments,createDoctorAppointment,updateAppointmentStatus,cancelDoctorAppointment,updateDoctorAvailabilityById } from '../controllers/doctorControllers.js';
 
 doctorRouter.get("/me",(req,res)=> {
+    /*
+#swagger.tags = ['Doctor']
+*/
     let doctor=req.user;
     if(!doctor || doctor.role!='doctor'){
         return res.status(400).json({
