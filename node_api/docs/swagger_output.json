@@ -38,71 +38,6 @@
     "application/json"
   ],
   "paths": {
-    "/doctors/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/users/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/doctors/register": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/users/register": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/logout": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/meUser": {
       "get": {
         "tags": [
@@ -119,20 +54,12 @@
         }
       }
     },
-    "/profile/{uid}": {
+    "/profile/": {
       "get": {
         "tags": [
           "User"
         ],
         "description": "",
-        "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -146,19 +73,13 @@
         }
       }
     },
-    "/updateProfile/{uid}": {
+    "/updateProfile/": {
       "patch": {
         "tags": [
-          "User"
+          "Doctor"
         ],
         "description": "",
         "parameters": [
-          {
-            "name": "uid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
@@ -184,6 +105,25 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/getAllDoctors": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Get all doctors",
         "responses": {
           "200": {
             "description": "OK"
@@ -392,30 +332,6 @@
         }
       }
     },
-    "/createAppointment/{aid}": {
-      "post": {
-        "tags": [
-          "Doctor"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "name": "aid",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
     "/updateAppointmentStatus/{aid}": {
       "put": {
         "tags": [
@@ -445,6 +361,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -479,7 +398,42 @@
         }
       }
     },
-    "/updateAvailability/{did}": {
+    "/getAvailableSlots/{did}": {
+      "get": {
+        "tags": [
+          "Doctor"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "did",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/updateAvailabilityStatus/{did}": {
       "patch": {
         "tags": [
           "Doctor"

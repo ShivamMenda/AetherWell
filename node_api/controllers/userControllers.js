@@ -109,6 +109,8 @@ export async function bookAppointment(req,res){
         doctorId:doctorId,
         userId:uid,
         date:finalDate,
+        startTime:startTime,
+        endTime:endTime,
         status:'confirmed'
     };
 
@@ -174,7 +176,7 @@ export async function getUserAppointments(req,res){
 */
     try {
     let uid=req.user.id;
-    let userAppointments= await UserAppointment.find({uid});
+    let userAppointments= await UserAppointment.find({userId:uid});
     if (!userAppointments) {
         return res.status(400).json({
             status:'fail',
@@ -182,10 +184,16 @@ export async function getUserAppointments(req,res){
         });
     };
     let appointments=[];
-    for (let i = 0; i < userAppointments.length; i++) {
-        let appointment= await Appointment.findById(userAppointments[i].userId);
+    for (let userApp of userAppointments) {
+        let appointment= await Appointment.findById(userApp.appointmentId);
+        if (!appointment) {
+            return res.status(400).json({
+                status:'fail',
+                message:'No appointments found'
+            });
+        };
         appointments.push(appointment);
-    };
+    }
     return res.status(200).json({
         status:'success',
         appointments:appointments,
@@ -227,15 +235,15 @@ export async function cancelAppointment(req,res) {
 */
     let uid=req.user.id;
     let appointmentId=req.params.aid;
-    let userAppointment= await UserAppointment.findOne({uid,appointmentId});
+    let userAppointment= await UserAppointment.findOne({userId:uid,appointmentId:appointmentId});
     if (!userAppointment) {
         return res.status(400).json({
             status:'fail',
             message:'Appointment not found'
         });
     };
-    let isUserCancelled= await UserAppointment.deleteOne({uid,appointmentId});
-    let isDoctorCancelled= await DoctorAppointment.deleteOne({appointmentId});
+    let isUserCancelled= await UserAppointment.deleteOne({userId:uid,appointmentId:appointmentId});
+    let isDoctorCancelled= await DoctorAppointment.deleteOne({appointmentId:appointmentId});
     let isAppCancelled= await Appointment.findByIdAndDelete(appointmentId);
     if (!isUserCancelled || !isDoctorCancelled || !isAppCancelled) {
         return res.status(400).json({
