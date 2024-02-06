@@ -89,20 +89,26 @@ export async function bookAppointment(req,res){
     };
     let temp_day= new Date(date.split('-').reverse().join('-')).toLocaleDateString('en-US', { weekday: 'long' });
 
-    let dayAvailability= doctor.availability.find((day)=>{
-        day.day==temp_day? true:false;
-    })
+    let isAvailable=false; 
     for (let day of doctor.availability) {
-        for (let slot of day.slots) {
-            slot.status='available'? dayAvailability=true:dayAvailability=false;
+        if (day.day==temp_day) {
+            for (let slot of day.slots) {
+                if (slot.start==startTime && slot.end==endTime) {
+                    if (slot.status=='available') {
+                        isAvailable=true;
+                    }
+                }
+            }
         }
     }
-    if (dayAvailability===false ) {
+    if (!isAvailable) {
         return res.status(400).json({
             status:'fail',
-            message:'Doctor not available',
+            message:'Doctor not available'
         });
-    };
+    }
+
+    
     let finalDate= new Date(date);
     let uid=req.user.id;
     let newAppointment={
@@ -140,35 +146,31 @@ export async function bookAppointment(req,res){
         doctorId:doctorId,
         appointmentId:newAppointmentBooked._id,
     });
-    if (!userApp || !doctorApp) {
+    // let up_status= await Doctor.updateOne(
+    //     { _id: newAppointment.doctorId, 'availability.$day': temp_day, 'availability.$slots': { $elemMatch: { start: startTime, end: endTime } } },
+    //     { $set: { 'availability.$slots.$status': 'booked' } }
+    // );
+    if (!userApp || !doctorApp || !up_status) {
         return res.status(400).json({
             status:'fail',
             message:'Appointment not booked'
         });
     };
-    for (let day of doctor.availability) {
-        if (day.day==temp_day) {
-            for (let slot of day.slots) {
-                if (slot.start==startTime && slot.end==endTime) {
-                    slot.status='booked';
-                }
-            }
-        }
-    }
+    
+    
     return res.status(200).json({
         status:'success',
         appointment: newAppointment,
     });
-    
-        
-    } catch (error) {
-        return res.status(500).json({
-            status:'fail',
-            message:error.message
-        });
-    }
-    
+} catch (error) {
+    return res.status(500).json({
+        status:'fail',
+        message:error.message
+    });
 }
+}
+    
+
 
 export async function getUserAppointments(req,res){
             /*
@@ -236,6 +238,7 @@ export async function cancelAppointment(req,res) {
     let uid=req.user.id;
     let appointmentId=req.params.aid;
     let userAppointment= await UserAppointment.findOne({userId:uid,appointmentId:appointmentId});
+    // let appointment= await Appointment.findById(appointmentId);
     if (!userAppointment) {
         return res.status(400).json({
             status:'fail',
@@ -251,6 +254,11 @@ export async function cancelAppointment(req,res) {
             message:'Appointment not cancelled'
         });
     };
+    // let temp_day= new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long' });
+    // await Doctor.updateOne(
+    //     { _id: appointment.doctorId, 'availability.day': temp_day, 'availability.slots': { $elemMatch: { start: appointment.startTime, end: appointment.endTime } } },
+    //     { $set: { 'availability.$.slots.$.status': 'available' } }
+    // );
     return res.status(200).json({
         status:'success',
         message:'Appointment cancelled successfully'

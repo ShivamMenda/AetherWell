@@ -265,6 +265,15 @@ export async function updateAvailabilityStatus(req,res){
                 message: `Slot not available`
             });
         }
+        if(s.status === 'booked') {
+            s.status = 'available';
+        }
+        else{
+            return res.status(400).json({
+                status: 'fail',
+                message: `Slot not available`
+            });
+        }
         await doctor.save();
 
         return res.status(200).json({
