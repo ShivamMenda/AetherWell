@@ -24,12 +24,12 @@ userRouter.get("/meUser",(req,res)=> {
     });
     
 });
-userRouter.get("/profile/",getUserprofile);
+userRouter.get("/profile/:uid",getUserprofile);
 userRouter.patch("/updateProfile/",updateUserprofile);
 userRouter.get("/getAllDoctors",getAllDoctors);
 userRouter.post("/bookAppointment",bookAppointment);
 userRouter.get("/appointments",getUserAppointments);
 userRouter.get("/getName/:uid",getUserNamebyId);
-userRouter.delete("/cancelAppointment/:aid",cancelAppointment);
+userRouter.delete("/cancelAppointment/",cancelAppointment);
 
 export default userRouter;

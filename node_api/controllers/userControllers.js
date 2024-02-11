@@ -3,6 +3,7 @@ import Doctor from "../models/doctors.js";
 import Appointment from "../models/appointments.js";
 import UserAppointment from "../models/userAppointments.js";
 import DoctorAppointment from "../models/doctorAppointments.js";
+import mongoose from "mongoose";
 
 export async function getUserprofile(req,res){
         /*
@@ -78,15 +79,18 @@ export async function bookAppointment(req,res){
             /*
 #swagger.tags = ['User']
 */
-    try {
-        let {doctorId,date,startTime,endTime}= req.body;
-    let doctor= await Doctor.findById(doctorId);
+let {doctorId,date,startTime,endTime}= req.body;
+let doctor= await Doctor.findById(doctorId);
     if(!doctor){
         return res.status(400).json({
             status:'fail',
             message:'Doctor not found'
         });
     };
+    const session= await mongoose.connection.startSession();
+    try {
+        await session.withTransaction(async () => { 
+    
     let temp_day= new Date(date.split('-').reverse().join('-')).toLocaleDateString('en-US', { weekday: 'long' });
 
     let isAvailable=false; 
@@ -121,46 +125,40 @@ export async function bookAppointment(req,res){
     };
 
 
-    let app = await Appointment.create(newAppointment);
-    if (!app) {
-        return res.status(400).json({
-            status:'fail',
-            message:'Appointment not booked'
-        });
-    };
+    let app= await Appointment.create([newAppointment],{session});
+    let app_id=app[0]._id;
 
-    let newAppointmentBooked= await Appointment.findById(app._id);
-    if (!newAppointmentBooked) {
-        return res.status(400).json({
-            status:'fail',
-            message:'Appointment not booked'
-        });
-        
-    }
-    let userApp= await UserAppointment.create({
+    await UserAppointment.create([{
         userId:uid,
-        appointmentId:newAppointmentBooked._id, 
-    });
+        appointmentId:app_id,
+    }],{session});
 
-    let doctorApp= await DoctorAppointment.create({
+   await DoctorAppointment.create([{
         doctorId:doctorId,
-        appointmentId:newAppointmentBooked._id,
-    });
-    // let up_status= await Doctor.updateOne(
-    //     { _id: newAppointment.doctorId, 'availability.$day': temp_day, 'availability.$slots': { $elemMatch: { start: startTime, end: endTime } } },
-    //     { $set: { 'availability.$slots.$status': 'booked' } }
-    // );
-    if (!userApp || !doctorApp || !up_status) {
-        return res.status(400).json({
-            status:'fail',
-            message:'Appointment not booked'
-        });
-    };
+        appointmentId:app_id,
+    }],{session});
+
+    for (let day of doctor.availability) {
+        if (day.day==temp_day) {
+            for (let slot of day.slots) {
+                if (slot.start==startTime && slot.end==endTime) {
+                    slot.status='booked';
+                }
+            }
+        }
+    }
+    await Doctor.updateOne(
+        { _id: doctorId },
+        { $set: { availability: doctor.availability } },
+        { session }
+    );
+
     
-    
+});
+    session.endSession(); 
     return res.status(200).json({
         status:'success',
-        appointment: newAppointment,
+        message:'Appointment booked successfully',
     });
 } catch (error) {
     return res.status(500).json({
@@ -235,34 +233,54 @@ export async function cancelAppointment(req,res) {
             /*
 #swagger.tags = ['User']
 */
-    let uid=req.user.id;
-    let appointmentId=req.params.aid;
-    let userAppointment= await UserAppointment.findOne({userId:uid,appointmentId:appointmentId});
-    // let appointment= await Appointment.findById(appointmentId);
-    if (!userAppointment) {
-        return res.status(400).json({
-            status:'fail',
-            message:'Appointment not found'
-        });
-    };
-    let isUserCancelled= await UserAppointment.deleteOne({userId:uid,appointmentId:appointmentId});
-    let isDoctorCancelled= await DoctorAppointment.deleteOne({appointmentId:appointmentId});
-    let isAppCancelled= await Appointment.findByIdAndDelete(appointmentId);
-    if (!isUserCancelled || !isDoctorCancelled || !isAppCancelled) {
-        return res.status(400).json({
-            status:'fail',
-            message:'Appointment not cancelled'
-        });
-    };
-    // let temp_day= new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long' });
-    // await Doctor.updateOne(
-    //     { _id: appointment.doctorId, 'availability.day': temp_day, 'availability.slots': { $elemMatch: { start: appointment.startTime, end: appointment.endTime } } },
-    //     { $set: { 'availability.$.slots.$.status': 'available' } }
-    // );
-    return res.status(200).json({
-        status:'success',
-        message:'Appointment cancelled successfully'
+let uid=req.user.id;
+let appointmentId=req.body.aid;
+let doctorId=req.body.did;
+let doctor= await Doctor.findById(doctorId);
+let userAppointment= await UserAppointment.findOne({userId:uid,appointmentId:appointmentId});
+let appointment= await Appointment.findById(appointmentId);
+let temp_day= new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long' });
+if (!userAppointment) {
+    return res.status(400).json({
+        status:'fail',
+        message:'Appointment not found'
     });
+};
+    const session= await mongoose.connection.startSession();
+    try {
+        await session.withTransaction(async () => {
+        await UserAppointment.findOneAndDelete([{userId:uid,appointmentId:appointmentId}],{session});
+        await DoctorAppointment.findOneAndDelete([{appointmentId:appointmentId}],{session});
+        await Appointment.findByIdAndDelete(appointmentId,{session});
+       
+        for (let day of doctor.availability) {
+            if (day.day==temp_day) {
+                for (let slot of day.slots) {
+                    if (slot.start==appointment.startTime && slot.end==appointment.endTime) {
+                        slot.status='available';
+                    }
+                }
+            }
+        }
+        await Doctor.updateOne(
+            { _id: doctorId },
+            { $set: { availability: doctor.availability } },
+            { session }
+        );
+});
+        session.endSession();
+        return res.status(200).json({
+            status:'success',
+            message:'Appointment cancelled successfully'
+        });
+        
+    } catch (error) {
+        return res.status(500).json({
+            status:'fail',
+            message:error.message
+        });
+        
+    } 
 }
 
 export async function getAllDoctors(req,res){
