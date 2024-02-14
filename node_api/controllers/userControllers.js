@@ -113,12 +113,14 @@ let doctor= await Doctor.findById(doctorId);
     }
 
     
-    let finalDate= new Date(date);
+    let dateStr = date;
+    let parts = dateStr.split("-");
+    let dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
     let uid=req.user.id;
     let newAppointment={
         doctorId:doctorId,
         userId:uid,
-        date:finalDate,
+        date:dateObj,
         startTime:startTime,
         endTime:endTime,
         status:'confirmed'
