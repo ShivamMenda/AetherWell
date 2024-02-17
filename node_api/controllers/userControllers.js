@@ -106,10 +106,7 @@ let doctor= await Doctor.findById(doctorId);
         }
     }
     if (!isAvailable) {
-        return res.status(400).json({
-            status:'fail',
-            message:'Doctor not available'
-        });
+        throw new Error('Slot not available');
     }
 
     
