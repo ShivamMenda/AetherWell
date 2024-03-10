@@ -25,7 +25,7 @@ export const userAuth = async (req, res, next) => {
             });
         };
     console.log(decoded);
-     req.user = decoded;
+    req.user = decoded;
     next();
     
     });

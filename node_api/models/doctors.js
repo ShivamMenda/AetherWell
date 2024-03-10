@@ -1,9 +1,18 @@
 import mongoose from "mongoose";
 
+function generateSlots() {
+    const slots = [];
 
+    for (let hour = 0; hour < 24; hour++) {
+        slots.push({ start: `${hour}:00`, end: `${hour + 1}:00` });
+    }
+
+    return slots;
+}
 const SlotSchema = new mongoose.Schema({
     start: { type: String, required: true },
-    end: { type: String, required: true }
+    end: { type: String, required: true },
+    status: { type: String, enum: ['available', 'booked'], default: 'available', required: true }
 });
 
 const DayAvailabilitySchema = new mongoose.Schema({
@@ -21,9 +30,20 @@ const DoctorSchema = new mongoose.Schema({
     hospital: { type: String, required: true },
     address: { type: String, required: false },
     phone: { type: String, required: false },
-    availability: { type: [DayAvailabilitySchema], required: false }
+    availability: {
+        type: [DayAvailabilitySchema],
+        required: true,
+        default: [
+            { day: 'Monday', slots: generateSlots() },
+            { day: 'Tuesday', slots: generateSlots() },
+            { day: 'Wednesday', slots: generateSlots() },
+            { day: 'Thursday', slots: generateSlots() },
+            { day: 'Friday', slots: generateSlots() },
+        ]
+    }
 });
 
 let Doctor= mongoose.model('Doctor', DoctorSchema);
 
 export default Doctor;
+

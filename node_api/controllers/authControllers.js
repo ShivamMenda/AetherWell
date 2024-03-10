@@ -93,11 +93,13 @@ export async function userLogin(req,role,res) {
                 role:doctor.role,
                 name:doctor.name,
                 email:doctor.email,
+                id:doctor._id,
             },process.env.APP_SECRET,{expiresIn:'3 days'});
             let result={
                 name:doctor.name,
                 role:doctor.role,
                 email:doctor.email,
+                id:doctor._id,
                 token:`Bearer ${token}`,
                 expiresIn:168,
             };
@@ -138,6 +140,7 @@ export async function userLogin(req,role,res) {
         role: user.role,
         name: user.name,
         email: user.email,
+        id: user._id,
       },
       process.env.APP_SECRET,
       { expiresIn: "3 days" }
@@ -147,6 +150,7 @@ export async function userLogin(req,role,res) {
       name: user.name,
       role: user.role,
       email: user.email,
+      id: user._id,
       token: `Bearer ${token}`,
       expiresIn: 168,
     };
