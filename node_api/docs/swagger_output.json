@@ -54,12 +54,20 @@
         }
       }
     },
-    "/profile/": {
+    "/profile/{uid}": {
       "get": {
         "tags": [
           "User"
         ],
         "description": "",
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -222,7 +230,7 @@
         }
       }
     },
-    "/cancelAppointment/{aid}": {
+    "/cancelAppointment/": {
       "delete": {
         "tags": [
           "User"
@@ -230,10 +238,19 @@
         "description": "",
         "parameters": [
           {
-            "name": "aid",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "aid": {
+                  "example": "any"
+                },
+                "did": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -242,6 +259,9 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
