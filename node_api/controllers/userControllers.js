@@ -307,3 +307,76 @@ export async function getAllDoctors(req,res){
         });
     }
 }
+
+export async function autoBookAppointment(req, res) {
+    let { doctorId,date } = req.body;
+    let doctor = await Doctor.findById(doctorId);
+    if (!doctor) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Doctor not found'
+        });
+    };
+    const session = await mongoose.connection.startSession();
+    try {
+        await session.withTransaction(async () => {
+            let temp_day= new Date(date.split('-').reverse().join('-')).toLocaleDateString('en-US', { weekday: 'long' });
+            let isAvailable = false;
+            let slotToBook;
+            for (let day of doctor.availability) {
+                for (let slot of day.slots) {
+                    if (slot.status == 'available' && day.day == temp_day) {
+                        isAvailable = true;
+                        slotToBook = slot;
+                        break;
+                    }
+                }
+                if (isAvailable) {
+                    break;
+                }
+            }
+            if (!isAvailable) {
+                throw new Error('No slots available');
+            }
+            let dateStr = date;
+            let parts = dateStr.split("-");
+            let dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+            let uid = req.user.id;
+            let newAppointment = {
+                doctorId: doctorId,
+                userId: uid,
+                date: dateObj,
+                startTime: slotToBook.start,
+                endTime: slotToBook.end,
+                status: 'confirmed'
+            };
+            let app = await Appointment.create([newAppointment], { session });
+            let app_id = app[0]._id;
+            await UserAppointment.create([{
+                userId: uid,
+                appointmentId: app_id,
+            }], { session });
+            await DoctorAppointment.create([{
+                doctorId: doctorId,
+                appointmentId: app_id,
+            }], { session });
+            slotToBook.status = 'booked';
+            await Doctor.updateOne(
+                { _id: doctorId },
+                { $set: { availability: doctor.availability } },
+                { session }
+            );
+        });
+        session.endSession();
+        return res.status(200).json({
+            status: 'success',
+            message: 'Appointment auto-booked successfully',
+        });
+    } catch (error) {
+        session.endSession();
+        return res.status(500).json({
+            status: 'fail',
+            message: error.message
+        });
+    }
+}

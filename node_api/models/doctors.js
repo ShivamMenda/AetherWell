@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 function generateSlots() {
     const slots = [];
 
-    for (let hour = 0; hour < 24; hour++) {
+    for (let hour = 7; hour < 21; hour++) {
         slots.push({ start: `${hour}:00`, end: `${hour + 1}:00` });
     }
 
