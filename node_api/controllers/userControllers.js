@@ -10,7 +10,7 @@ export async function getUserprofile(req,res){
 #swagger.tags = ['User']
 */
     try{
-        let user= await User.findById(req.user.id);
+        let user= await User.findById(req.params.uid);
         if(!user){
             return res.status(400).json({
                 status:'fail',
