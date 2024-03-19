@@ -10,7 +10,9 @@ import swagger from 'swagger-ui-express';
 import data from './docs/swagger_output.json' assert { type: "json" };
 import {connectDB} from './utils/connection.js';
 import { rateLimiterMiddleware } from './middlewares/rateLimiter.js';
+import cors from 'cors';
 const app=express();
+app.use(cors()); 
 
 config({path:'./config.env'});
 
