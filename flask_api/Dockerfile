@@ -12,6 +12,7 @@ COPY requirements.txt /app/
 COPY datasets /app/datasets
 COPY models/ /app/models
 COPY app.py /app/
+COPY symptoms.json /app/
 
 # Install the Python libraries
 RUN pip3 install -r requirements.txt
