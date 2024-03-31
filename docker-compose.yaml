@@ -24,16 +24,4 @@ services:
     depends_on:
       - flask-api
   
-  frontend:
-      build: 
-        context: ./frontend
-        dockerfile: Dockerfile
-      ports:
-        - "8080:8080"
-      volumes:
-        - ./frontend:/app
-        - /app/node_modules
-      depends_on:
-        - flask-api
-        - nodejs-api
 
