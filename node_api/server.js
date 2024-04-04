@@ -27,8 +27,8 @@ if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'testing'
 app.use(express.json());
 app.use("/api-docs", swagger.serve, swagger.setup(data));
 app.use("/api/v1/auth",authRouter);
-app.use("/api/v1/users",userAuth,rateLimiterMiddleware,userRouter); //No check here because doctor should be able to view user data.
-app.use("/api/v1/doctors",userAuth,checkRole("doctor"),rateLimiterMiddleware,doctorRouter);
+app.use("/api/v1/users",userAuth,rateLimiterMiddleware,userRouter); 
+app.use("/api/v1/doctors",userAuth,rateLimiterMiddleware,doctorRouter);
 
 app.get('/',(req,res)=>{
     res.status(200).send('AetherWell api running');
