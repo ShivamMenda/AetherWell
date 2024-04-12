@@ -10,7 +10,7 @@ from flask_cors import CORS
 
 spark=SparkSession.builder.appName("HealthRecAPI").getOrCreate()
 app=Flask(__name__)
-CORS(app)
+CORS(app,methods=['GET','POST'])
 @app.route("/")
 def home():
     return "Welcome to HealthRecAPI"
@@ -24,7 +24,7 @@ def get_all_symptoms():
     print("Data loaded")
     return jsonify(data)
 
-@app.route("/predict/", methods=["POST"])
+@app.route("/predict", methods=["POST"])
 def predict():
     try:
         print("Loading data")
