@@ -54,10 +54,13 @@ export async function updateUserprofile(req,res){
         user.age=req.body.age;
         user.address=req.body.address;
         user.phone=req.body.phone;
+        user.gender=req.body.gender;
+        user.username=req.body.username;
         await user.save();
         return res.status(200).json({
             status:'success',
             profile:{
+                id: user.id,
                 name:user.name,
                 email:user.email,
                 role:user.role,
@@ -65,6 +68,8 @@ export async function updateUserprofile(req,res){
                 address:user.address,
                 phone:user.phone,
                 createdAt:user.createdAt,
+                gender:user.gender,
+                username:user.username,
             }
         });
     }catch(err){
