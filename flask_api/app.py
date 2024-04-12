@@ -6,10 +6,11 @@ from pyspark.ml.recommendation import ALSModel
 from flask import Flask, request, jsonify,Response
 import json
 import os
+from flask_cors import CORS
 
 spark=SparkSession.builder.appName("HealthRecAPI").getOrCreate()
 app=Flask(__name__)
-
+CORS(app)
 @app.route("/")
 def home():
     return "Welcome to HealthRecAPI"
