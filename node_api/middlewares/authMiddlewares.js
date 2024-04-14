@@ -7,6 +7,7 @@ export const userAuth = async (req, res, next) => {
     if (!authorization) {
         return res.status(401).json({
             status: 'fail',
+            redirect:"/login",
             message: 'You are not logged in! Please log in to get access.',
         });
     }
@@ -15,12 +16,14 @@ export const userAuth = async (req, res, next) => {
         if (err) {
             return res.status(403).json({
                 status: 'fail',
+                redirect:"/login",
                 message: 'Invalid token! Please log in again.',
             });
         };
         if (!decoded) {
             return res.status(403).json({
                 status: 'fail',
+                redirect:"/login",
                 message: 'Invalid token! Please log in again.',
             });
         };
