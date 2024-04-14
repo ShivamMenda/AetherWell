@@ -20,6 +20,7 @@ export async function getUserprofile(req,res){
         return res.status(200).json({
             status:'success',
             profile:{
+                id: user.id,
                 name:user.name,
                 email:user.email,
                 role:user.role,
@@ -27,6 +28,7 @@ export async function getUserprofile(req,res){
                 address:user.address,
                 phone:user.phone,
                 createdAt:user.createdAt,
+                gender:user.gender,
                 username:user.username,
             }
         });

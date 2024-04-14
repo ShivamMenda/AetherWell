@@ -26,6 +26,7 @@ const DoctorSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     role: { type: String, enum: ['user', 'doctor'], default: 'doctor', required: true },
     name: { type: String, required: true },
+    gender:{ type:String },
     age: { type: Number, required: true },
     specialization: { type: String, required: true },
     hospital: { type: String, required: true },

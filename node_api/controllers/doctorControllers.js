@@ -23,7 +23,9 @@ export async function getDoctorprofile(req,res){
             age:doctor.age,
             address:doctor.address,
             phone:doctor.phone,
+            gender:doctor.gender,
             specialization:doctor.specialization,
+            hospital: doctor.hospital,
             createdAt:doctor.createdAt,
         };
         return res.status(200).json({
@@ -55,16 +57,24 @@ export async function updateDoctorProfile(req,res){
         doctor.age=req.body.age;
         doctor.address=req.body.address;
         doctor.phone=req.body.phone;
+        doctor.gender=req.body.gender;
+        doctor.specialization=req.body.specialization;
+        doctor.hospital=req.body.hospital;
+        doctor.username=req.body.username;
         await doctor.save();
         return res.status(200).json({
             status:'success',
             profile:{
                 name:doctor.name,
                 email:doctor.email,
+                username: doctor.username,
                 role:doctor.role,
                 age:doctor.age,
                 address:doctor.address,
                 phone:doctor.phone,
+                specialization:doctor.specialization,
+                gender:doctor.gender,
+                hospital: doctor.hospital,
                 createdAt:doctor.createdAt,
             }
         });
@@ -108,6 +118,7 @@ export async function getDoctorAppointments(req,res){
         }
         let doctorId=req.user.id;
         let doctorAppointments= await DoctorAppointment.find({doctorId:doctorId});
+        console.log({doctorAppointments});
         if(!doctorAppointments){
             return res.status(400).json({
                 status:'fail',
@@ -116,7 +127,9 @@ export async function getDoctorAppointments(req,res){
         }
         let appointments=[];
     for (let doctorApp of doctorAppointments) {
-        let appointment= await Appointment.findById(doctorApp.appointmentId);
+        let appointment= await Appointment.findById(doctorApp.appointmentId).populate(['doctorId','userId']);
+        appointment.userId.password=undefined;
+        appointment.doctorId.password=undefined;
         if (!appointment) {
             return res.status(400).json({
                 status:'fail',
