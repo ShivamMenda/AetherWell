@@ -27,6 +27,7 @@ export async function getUserprofile(req,res){
                 address:user.address,
                 phone:user.phone,
                 createdAt:user.createdAt,
+                username:user.username,
             }
         });
     }catch(err){

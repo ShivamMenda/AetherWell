@@ -18,6 +18,7 @@ export async function getDoctorprofile(req,res){
         const finalDoctor={
             name:doctor.name,
             email:doctor.email,
+            username: doctor.username,
             role:doctor.role,
             age:doctor.age,
             address:doctor.address,
