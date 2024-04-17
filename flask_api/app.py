@@ -13,7 +13,7 @@ app=Flask(__name__)
 CORS(app,methods=['GET','POST'])
 @app.route("/")
 def home():
-    return "Welcome to HealthRecAPI"
+    return jsonify({"status": 'success', "message":"Welcome to HealthRecAPI"})
 
 @app.route("/get_all_symptoms", methods=["GET"])
 def get_all_symptoms():

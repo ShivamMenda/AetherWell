@@ -33,6 +33,12 @@ app.use("/api/v1/doctors",userAuth,rateLimiterMiddleware,doctorRouter);
 app.get('/',(req,res)=>{
     res.status(200).send('AetherWell api running');
 });
+app.get('/api/v1/',(req,res)=>{
+    res.json({
+        status: "success",
+        message:"AetherWell api running"
+    })
+});
 
 
 const port=process.env.PORT || 3000;

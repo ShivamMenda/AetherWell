@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 
 export const userAuth = async (req, res, next) => {
     const { authorization } = req.headers;
-    console.log(process.env.APP_SECRET);
     if (!authorization) {
         return res.status(401).json({
             status: 'fail',
@@ -27,7 +26,6 @@ export const userAuth = async (req, res, next) => {
                 message: 'Invalid token! Please log in again.',
             });
         };
-    console.log(decoded);
     req.user = decoded;
     next();
     

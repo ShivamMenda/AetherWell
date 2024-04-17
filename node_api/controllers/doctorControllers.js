@@ -16,6 +16,7 @@ export async function getDoctorprofile(req,res){
             });
         }
         const finalDoctor={
+            id: doctor.id,
             name:doctor.name,
             email:doctor.email,
             username: doctor.username,
@@ -65,6 +66,7 @@ export async function updateDoctorProfile(req,res){
         return res.status(200).json({
             status:'success',
             profile:{
+                id: doctor.id,
                 name:doctor.name,
                 email:doctor.email,
                 username: doctor.username,
@@ -118,7 +120,6 @@ export async function getDoctorAppointments(req,res){
         }
         let doctorId=req.user.id;
         let doctorAppointments= await DoctorAppointment.find({doctorId:doctorId});
-        console.log({doctorAppointments});
         if(!doctorAppointments){
             return res.status(400).json({
                 status:'fail',

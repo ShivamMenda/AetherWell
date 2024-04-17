@@ -183,23 +183,19 @@ export async function getUserAppointments(req,res){
 */
     try {
     let uid=req.user.id;
-    let userAppointments= await UserAppointment.find({userId:uid});
+    let userAppointments= await UserAppointment.find({userId:uid})
     if (!userAppointments) {
-        return res.status(400).json({
-            status:'fail',
-            message:'No appointments found'
+        return res.status(200).json({
+            status:'success',
+            appointments:[],
         });
     };
     let appointments=[];
     for (let userApp of userAppointments) {
-        let appointment= await Appointment.findById(userApp.appointmentId);
-        if (!appointment) {
-            return res.status(400).json({
-                status:'fail',
-                message:'No appointments found'
-            });
+        let appointment= await Appointment.findById(userApp.appointmentId).populate('doctorId');
+        if (appointment) {
+            appointments.push(appointment);
         };
-        appointments.push(appointment);
     }
     return res.status(200).json({
         status:'success',
