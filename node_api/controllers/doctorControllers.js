@@ -107,48 +107,42 @@ export async function getDoctorNamebyId(req,res){
 }
 
 export async function getDoctorAppointments(req,res){
-        /*
+    /*
 #swagger.tags = ['Doctor']
 */
-    try{
-        let doctor= await Doctor.findById(req.user.id);
-        if(!doctor){
-            return res.status(400).json({
-                status:'fail',
-                message:'Doctor not found'
-            });
-        }
-        let doctorId=req.user.id;
-        let doctorAppointments= await DoctorAppointment.find({doctorId:doctorId});
-        if(!doctorAppointments){
-            return res.status(400).json({
-                status:'fail',
-                message:'No appointments found'
-            });
-        }
-        let appointments=[];
-    for (let doctorApp of doctorAppointments) {
-        let appointment= await Appointment.findById(doctorApp.appointmentId).populate(['doctorId','userId']);
-        appointment.userId.password=undefined;
-        appointment.doctorId.password=undefined;
-        if (!appointment) {
-            return res.status(400).json({
-                status:'fail',
-                message:'No appointments found'
-            });
-        };
-        appointments.push(appointment);
-    }
-        return res.status(200).json({
-            status:'success',
-            appointments:appointments,
-        });
-    }catch(err){
-        return res.status(500).json({
+try{
+    let doctor= await Doctor.findById(req.user.id);
+    if(!doctor){
+        return res.status(400).json({
             status:'fail',
-            message:err.message
+            message:'Doctor not found'
         });
     }
+    let doctorId=req.user.id;
+    let doctorAppointments= await DoctorAppointment.find({doctorId:doctorId});
+    if(!doctorAppointments){
+        return res.status(400).json({
+            status:'fail',
+            message:'No appointments found'
+        });
+    }
+    let appointments=[];
+for (let doctorApp of doctorAppointments) {
+    let appointment= await Appointment.findById(doctorApp.appointmentId).populate('userId');
+    if(appointment){
+    appointments.push(appointment);
+    }
+}
+    return res.status(200).json({
+        status:'success',
+        appointments:appointments,
+    });
+}catch(err){
+    return res.status(500).json({
+        status:'fail',
+        message:err.message
+    });
+}
 }
 
 
