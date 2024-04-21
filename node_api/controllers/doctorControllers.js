@@ -128,7 +128,7 @@ try{
     }
     let appointments=[];
 for (let doctorApp of doctorAppointments) {
-    let appointment= await Appointment.findById(doctorApp.appointmentId).populate('userId');
+    let appointment= await Appointment.findById(doctorApp.appointmentId).populate('userId').populate('doctorId');
     if(appointment){
     appointments.push(appointment);
     }
