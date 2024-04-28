@@ -129,14 +129,11 @@ export async function getDoctorAppointments(req,res){
         let appointments=[];
     for (let doctorApp of doctorAppointments) {
         let appointment= await Appointment.findById(doctorApp.appointmentId).populate(['doctorId','userId']);
+        if (!appointment) {
+            continue
+        };
         appointment.userId.password=undefined;
         appointment.doctorId.password=undefined;
-        if (!appointment) {
-            return res.status(400).json({
-                status:'fail',
-                message:'No appointments found'
-            });
-        };
         appointments.push(appointment);
     }
         return res.status(200).json({
@@ -247,6 +244,31 @@ export async function getAvailableSlots(req,res){
             message: err.message
         });
     }
+}
+
+
+export async function getSlotsByDoctorId(req,res){
+    /*
+#swagger.tags = ['Doctor']
+*/
+try {
+    const doctor = await Doctor.findById(req.params.did);
+    if (!doctor) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Doctor not found'
+        });
+    }
+    return res.status(200).json({
+        status: 'success',
+        availability: doctor.availability
+    });
+} catch (err) {
+    return res.status(500).json({
+        status: 'fail',
+        message: err.message
+    });
+}
 }
 
 export async function updateAvailabilityStatus(req,res){
