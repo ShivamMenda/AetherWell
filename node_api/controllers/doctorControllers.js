@@ -2,6 +2,7 @@ import Doctor from "../models/doctors.js";
 import DoctorAppointment from "../models/doctorAppointments.js";
 import Appointment from "../models/appointments.js";
 import UserAppointment from "../models/userAppointments.js";
+import mongoose from "mongoose";
 
 export async function getDoctorprofile(req,res){
         /*
@@ -176,23 +177,40 @@ export async function updateAppointmentStatus(req,res){
 export async function cancelDoctorAppointment(req,res){
         /*
 #swagger.tags = ['Doctor']
-*/
+*/ 
+const session= await mongoose.connection.startSession();
+let doctorId=req.user.id;
+let appointmentId=req.params.aid;
+let doctor= await Doctor.findById(doctorId);
+let appointment= await Appointment.findById(appointmentId);
+let temp_day= new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long' });
     try {
-        let doctorId=req.user.id;
-        let appointmentId=req.params.aid;
-        let isDeleted= await DoctorAppointment.findOneAndDelete({doctorId:doctorId,appointmentId:appointmentId}) && Appointment.findOneAndDelete({_id:appointmentId}) && UserAppointment.findOneAndDelete({appointmentId:appointmentId});
-        let isCancelled= await DoctorAppointment.findOneAndUpdate({doctorId:doctorId,appointmentId:appointmentId},{status:"cancelled"});
-        if(!isDeleted || !isCancelled){
-            return res.status(400).json({
-                status:'fail',
-                message:'Appointment not cancelled'
-            });
-        }
-        return res.status(200).json({
-            status:'success',
-            message:'Appointment cancelled successfully',
-        });
-    
+       
+            await session.withTransaction(async () => {
+                await UserAppointment.findOneAndDelete([{appointmentId:appointmentId}],{session});
+                await DoctorAppointment.findOneAndDelete([{appointmentId:appointmentId}],{session});
+                await Appointment.findByIdAndDelete(appointmentId,{session});
+               
+                for (let day of doctor.availability) {
+                    if (day.day==temp_day) {
+                        for (let slot of day.slots) {
+                            if (slot.start==appointment.startTime && slot.end==appointment.endTime) {
+                                slot.status='available';
+                            }
+                        }
+                    }
+                }
+                await Doctor.updateOne(
+                    { _id: doctorId },
+                    { $set: { availability: doctor.availability } },
+                    { session }
+                );
+});
+session.endSession();
+return res.status(200).json({
+    status:'success',
+    message:'Appointment cancelled successfully',
+});
     } catch (error) {
         return res.status(500).json({
             status:'fail',
