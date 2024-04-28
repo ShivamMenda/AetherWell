@@ -41,6 +41,8 @@ const DoctorSchema = new mongoose.Schema({
             { day: 'Wednesday', slots: generateSlots() },
             { day: 'Thursday', slots: generateSlots() },
             { day: 'Friday', slots: generateSlots() },
+            { day: 'Saturday', slots: generateSlots() },
+            { day: 'Sunday', slots: generateSlots() },
         ]
     }
 });
