@@ -30,6 +30,6 @@ doctorRouter.get("/appointments/",getDoctorAppointments);
 doctorRouter.put("/updateAppointmentStatus/:aid",updateAppointmentStatus);
 doctorRouter.delete("/deleteAppointment/:aid",cancelDoctorAppointment);
 doctorRouter.get("/getAvailableSlots/:did",getAvailableSlots);
-doctorRouter.get("/getSlots/:did",getSlots);
+doctorRouter.post("/getSlots/:did",getSlots);
 doctorRouter.patch("/updateAvailabilityStatus/:did",updateAvailabilityStatus);
 export default doctorRouter;
