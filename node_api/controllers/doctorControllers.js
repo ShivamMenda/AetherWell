@@ -242,49 +242,42 @@ export async function getAvailableSlots(req, res) {
   /*
 #swagger.tags = ['Doctor']
 */
-  try {
-    const { date } = req.body;
-    const status = req.query.status;
-    let day = new Date(date.split("-").reverse().join("-")).toLocaleDateString(
-      "en-US",
-      { weekday: "long" }
-    );
-    const doctor = await Doctor.findById(req.params.did);
-    if (!doctor) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Doctor not found",
-      });
+    try {
+        const {date} = req.body;
+        const status= req.query.status;
+        let day=new Date(date.split('-').reverse().join('-')).toLocaleDateString('en-US', { weekday: 'long' });
+        const doctor = await Doctor.findById(req.params.did);
+        if (!doctor) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'Doctor not found'
+            });
+        }
+        const dayAvailability = doctor.availability.find(d => d.day === day);
+        if (!dayAvailability) {
+            return res.status(400).json({
+                status: 'fail',
+                message: `No availability set for ${day}`
+            });
+        }
+        if(status==='booked'){
+            const bookedSlots = dayAvailability.slots.filter(s => s.status === 'booked');
+            return res.status(200).json({
+                status: 'success',
+                slots:bookedSlots
+            });
+        }
+        const availableSlots = dayAvailability.slots.filter(s => s.status === 'available');
+        return res.status(200).json({
+            status: 'success',
+            slots:availableSlots
+        });
+    } catch (err) {
+        return res.status(500).json({
+            status: 'fail',
+            message: err.message
+        });
     }
-    const dayAvailability = doctor.availability.find((d) => d.day === day);
-    if (!dayAvailability) {
-      return res.status(400).json({
-        status: "fail",
-        message: `No availability set for ${day}`,
-      });
-    }
-    if (status === "booked") {
-      const bookedSlots = dayAvailability.slots.filter(
-        (s) => s.status === "booked"
-      );
-      return res.status(200).json({
-        status: "success",
-        slots: bookedSlots,
-      });
-    }
-    const availableSlots = dayAvailability.slots.filter(
-      (s) => s.status === "available"
-    );
-    return res.status(200).json({
-      status: "success",
-      slots: availableSlots,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      status: "fail",
-      message: err.message,
-    });
-  }
 }
 
 export async function getSlotsByDoctorId(req, res) {
