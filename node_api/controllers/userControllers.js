@@ -192,7 +192,7 @@ export async function getUserAppointments(req,res){
     };
     let appointments=[];
     for (let userApp of userAppointments) {
-        let appointment= await Appointment.findById(userApp.appointmentId).populate('doctorId');
+        let appointment= await Appointment.findById(userApp.appointmentId).populate('doctorId').populate('userId');
         if (appointment) {
             appointments.push(appointment);
         };
