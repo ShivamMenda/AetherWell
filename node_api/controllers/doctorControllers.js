@@ -289,31 +289,6 @@ try {
 }
 }
 
-
-export async function getSlotsByDoctorId(req,res){
-    /*
-#swagger.tags = ['Doctor']
-*/
-try {
-    const doctor = await Doctor.findById(req.params.did);
-    if (!doctor) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Doctor not found'
-        });
-    }
-    return res.status(200).json({
-        status: 'success',
-        availability: doctor.availability
-    });
-} catch (err) {
-    return res.status(500).json({
-        status: 'fail',
-        message: err.message
-    });
-}
-}
-
 export async function getSlots(req,res){
     /*
 #swagger.tags = ['Doctor']
