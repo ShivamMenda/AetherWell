@@ -313,7 +313,7 @@ export async function getAllDoctors(req,res){
 }
 
 export async function autoBookAppointment(req, res) {
-    let { date } = req.body;
+    let {date} = req.body;
     let doctorId= (await Doctor.find().sort({ age: -1 }).limit(1))[0].id;
     let doctor = await Doctor.findById(doctorId);
     if (!doctor) {
@@ -322,17 +322,42 @@ export async function autoBookAppointment(req, res) {
             message: 'Doctor not found'
         });
     };
+    function check(currentHour,curr_slot){
+        let slottobe=0;
+        switch (curr_slot){
+            case '7:00':slottobe=7;break;
+            case '8:00':slottobe=8;break;
+            case '9:00':slottobe=9;break;
+            case '10:00':slottobe=10;break;
+            case '11:00':slottobe=11;break;
+            case '12:00':slottobe=12;break;
+            case '13:00':slottobe=13;break;
+            case '14:00':slottobe=14;break;
+            case '15:00':slottobe=15;break;
+            case '16:00':slottobe=16;break;
+            case '17:00':slottobe=17;break;
+            case '18:00':slottobe=18;break;
+            case '19:00':slottobe=19;break;
+            case '20:00':slottobe=20;break;
+            default:0;
+        }
+        return currentHour<slottobe;
+    }
     const session = await mongoose.connection.startSession();
     try {
         await session.withTransaction(async () => {
             let temp_day= new Date(date.split('-').reverse().join('-')).toLocaleDateString('en-US', { weekday: 'long' });
+            let currTime=new Date()
+            let currentHour=currTime.getHours()
             let isAvailable = false;
             let slotToBook;
             for (let day of doctor.availability) {
                 for (let slot of day.slots) {
-                    if (slot.status == 'available' && day.day == temp_day) {
+                    
+                    if (slot.status == 'available' && day.day == temp_day && check(currentHour,slot.start)) {
                         isAvailable = true;
                         slotToBook = slot;
+                        console.log(slotToBook);
                         break;
                     }
                 }
