@@ -181,9 +181,11 @@ export async function getUserAppointments(req,res){
             /*
 #swagger.tags = ['User']
 */
+let uid=req.user.id;
     try {
-    let uid=req.user.id;
-    let userAppointments= await UserAppointment.find({userId:uid})
+    
+    let userAppointments= await UserAppointment.find({userId:uid});
+    console.log(userAppointments);
     if (!userAppointments) {
         return res.status(200).json({
             status:'success',
@@ -192,11 +194,13 @@ export async function getUserAppointments(req,res){
     };
     let appointments=[];
     for (let userApp of userAppointments) {
-        let appointment= await Appointment.findById(userApp.appointmentId).populate('doctorId').populate('userId');
-        if (appointment) {
+        console.log(userApp.appointmentId);
+        let appointment= await Appointment.findOne({userId:userApp.userId}).populate('doctorId').populate('userId');
+        if(appointment){
             appointments.push(appointment);
-        };
+        }
     }
+    console.log(appointments);
     return res.status(200).json({
         status:'success',
         appointments:appointments,

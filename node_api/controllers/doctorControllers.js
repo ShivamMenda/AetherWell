@@ -130,16 +130,17 @@ export async function getDoctorAppointments(req, res) {
     }
     let appointments = [];
     for (let doctorApp of doctorAppointments) {
-      let appointment = await Appointment.findById(
-        doctorApp.appointmentId
+      let appointment = await Appointment.findOne(
+        {doctorId:doctorApp.doctorId}
       ).populate(["doctorId", "userId"]);
-      if (!appointment) {
-        continue;
+      if (appointment) {
+        appointments.push(appointment);
       }
-      appointment.userId.password = undefined;
-      appointment.doctorId.password = undefined;
-      appointments.push(appointment);
+      // appointment.userId.password = undefined;
+      // appointment.doctorId.password = undefined;
+     
     }
+    console.log(appointments);
     return res.status(200).json({
       status: "success",
       appointments: appointments,
