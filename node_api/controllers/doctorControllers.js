@@ -119,27 +119,24 @@ export async function getDoctorAppointments(req, res) {
       });
     }
     let doctorId = req.user.id;
-    let doctorAppointments = await DoctorAppointment.find({
-      doctorId: doctorId,
-    });
-    if (!doctorAppointments) {
-      return res.status(400).json({
-        status: "fail",
-        message: "No appointments found",
-      });
-    }
-    let appointments = [];
-    for (let doctorApp of doctorAppointments) {
-      let appointment = await Appointment.findOne(
-        {doctorId:doctorApp.doctorId}
-      ).populate(["doctorId", "userId"]);
-      if (appointment) {
-        appointments.push(appointment);
-      }
-      // appointment.userId.password = undefined;
-      // appointment.doctorId.password = undefined;
+    // let doctorAppointments = await DoctorAppointment.find({
+    //   doctorId: doctorId,
+    // });
+    // if (!doctorAppointments) {
+    //   return res.status(400).json({
+    //     status: "fail",
+    //     message: "No appointments found",
+    //   });
+    // }
+    // let appointments = [];
+    // for (let doctorApp of doctorAppointments) {
+    //   let appointment = await Appointment.findById(doctorApp.appointmentId).populate('userId').populate('doctorId');
+    //   appointments.push(appointment);
+    //   // appointment.userId.password = undefined;
+    //   // appointment.doctorId.password = undefined;
      
-    }
+    // }
+    let appointments = await Appointment.find({doctorId:doctorId}).populate('userId').populate('doctorId');
     console.log(appointments);
     return res.status(200).json({
       status: "success",

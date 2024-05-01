@@ -184,22 +184,24 @@ export async function getUserAppointments(req,res){
 let uid=req.user.id;
     try {
     
-    let userAppointments= await UserAppointment.find({userId:uid});
-    console.log(userAppointments);
-    if (!userAppointments) {
-        return res.status(200).json({
-            status:'success',
-            appointments:[],
-        });
-    };
-    let appointments=[];
-    for (let userApp of userAppointments) {
-        console.log(userApp.appointmentId);
-        let appointment= await Appointment.findOne({userId:userApp.userId}).populate('doctorId').populate('userId');
-        if(appointment){
-            appointments.push(appointment);
-        }
-    }
+    // let userAppointments= await UserAppointment.find({userId:uid});
+    // console.log(userAppointments);
+    // if (!userAppointments) {
+    //     return res.status(200).json({
+    //         status:'success',
+    //         appointments:[],
+    //     });
+    // };
+    // let appointments=[];
+    // for (let userApp of userAppointments) {
+    //     console.log(userApp.appointmentId);
+
+    //     let appointment= await Appointment.findById(userApp.appointmentId).populate('doctorId').populate('userId');
+    //     console.log(appointment);
+    //    appointments.push(appointment);
+    // }
+    let appointments= await Appointment.find({userId:uid}).populate('doctorId').populate('userId');
+
     console.log(appointments);
     return res.status(200).json({
         status:'success',
