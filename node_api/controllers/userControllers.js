@@ -354,8 +354,10 @@ export async function autoBookAppointment(req, res) {
     try {
         await session.withTransaction(async () => {
             let temp_day= new Date(date.split('-').reverse().join('-')).toLocaleDateString('en-US', { weekday: 'long' });
-            let currTime=new Date()
-            let currentHour=currTime.getHours()
+            let currTime=new Date().toLocaleString("en-us",{ timeZone: 'Asia/Kolkata' ,hour12:false},);
+            let currentHour=currTime.split(" ")[1].split(":")[0];
+            console.log(currTime);
+            console.log(currentHour);
             let isAvailable = false;
             let slotToBook;
             for (let day of doctor.availability) {
