@@ -246,15 +246,16 @@ let uid=req.user.id;
 let appointmentId=req.body.aid;
 let doctorId=req.body.did;
 let doctor= await Doctor.findById(doctorId);
-let userAppointment= await UserAppointment.findOne({userId:uid,appointmentId:appointmentId});
+let userAppointment= await UserAppointment.findById(uid);
 let appointment= await Appointment.findById(appointmentId);
 let temp_day= new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long' });
-if (!userAppointment) {
-    return res.status(400).json({
-        status:'fail',
-        message:'Appointment not found'
-    });
-};
+console.log(userAppointment);
+// if (!userAppointment) {
+//     return res.status(400).json({
+//         status:'fail',
+//         message:'Appointment not found'
+//     });
+// };
     const session= await mongoose.connection.startSession();
     try {
         await session.withTransaction(async () => {
