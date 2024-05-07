@@ -320,8 +320,8 @@ export async function getAllDoctors(req,res){
 }
 
 export async function autoBookAppointment(req, res) {
-    let {date} = req.body;
-    let doctorId= (await Doctor.find().sort({ age: -1 }).limit(1))[0].id;
+    let date = req.body.date;
+    let doctorId= req.body.doctorId;
     let doctor = await Doctor.findById(doctorId);
     if (!doctor) {
         return res.status(400).json({
