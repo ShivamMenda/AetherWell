@@ -5,24 +5,26 @@ from pyspark.sql.functions import lower,trim
 from pyspark.ml.recommendation import ALSModel
 from flask import Flask, request, jsonify,Response
 import json
+import os
+from flask_cors import CORS
 
 spark=SparkSession.builder.appName("HealthRecAPI").getOrCreate()
 app=Flask(__name__)
-
+CORS(app,methods=['GET','POST'])
 @app.route("/")
 def home():
-    return "Welcome to HealthRecAPI"
+    return jsonify({"status": 'success', "message":"Welcome to HealthRecAPI"})
 
 @app.route("/get_all_symptoms", methods=["GET"])
 def get_all_symptoms():
     print("Loading data")
-    df=spark.read.csv("./datasets/final.csv",header=True,inferSchema=True)
+    SITE_ROOT = os.path.realpath(os.path.dirname(__file__))
+    json_url = os.path.join(SITE_ROOT,'symptoms.json')
+    data = json.load(open(json_url))
     print("Data loaded")
-    symptoms = df.select("symptom").distinct().rdd.flatMap(lambda x: x).collect()
-    return jsonify(symptoms)
+    return jsonify(data)
 
-
-@app.route("/predict/", methods=["POST"])
+@app.route("/predict", methods=["POST"])
 def predict():
     try:
         print("Loading data")

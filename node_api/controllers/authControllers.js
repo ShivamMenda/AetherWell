@@ -119,14 +119,14 @@ export async function userLogin(req,role,res) {
   if (!user) {
     return res.status(404).json({
       message: "User name is not found. Invalid login credentials.",
-      success: false,
+      success: 'fail',
     });
   }
   // We will check the if the user is logging in via the route for his departemnt
   if (user.role !== role) {
     return res.status(403).json({
       message: "Please make sure you are logging in from the right portal.",
-      success: false,
+      success: 'fail',
     });
   }
 

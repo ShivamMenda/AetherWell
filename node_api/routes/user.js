@@ -1,6 +1,6 @@
 import express from 'express';
 const userRouter= express.Router();
-import { getUserprofile,updateUserprofile,bookAppointment,getUserAppointments,getUserNamebyId,cancelAppointment,getAllDoctors } from '../controllers/userControllers.js';
+import { getUserprofile,updateUserprofile,bookAppointment,getUserAppointments,getUserNamebyId,cancelAppointment,getAllDoctors,autoBookAppointment } from '../controllers/userControllers.js';
 
 userRouter.get("/meUser",(req,res)=> {
         /*
@@ -31,5 +31,6 @@ userRouter.post("/bookAppointment",bookAppointment);
 userRouter.get("/appointments",getUserAppointments);
 userRouter.get("/getName/:uid",getUserNamebyId);
 userRouter.delete("/cancelAppointment/",cancelAppointment);
+userRouter.post("/autoBookAppointment",autoBookAppointment);
 
 export default userRouter;
